@@ -1,0 +1,43 @@
+name: 무신사 가격 수집
+
+on:
+  schedule:
+    # 매일 한국 시간 오전 9시 17분 (GitHub 예약은 UTC 기준이라 00:17)
+    - cron: "17 0 * * *"
+  workflow_dispatch: # Actions 탭에서 'Run workflow' 버튼으로 바로 실행 가능
+  push:
+    paths:
+      - products.txt # 상품 목록을 수정하면 바로 한 번 수집
+
+permissions:
+  contents: write
+
+concurrency:
+  group: price-tracker
+  cancel-in-progress: false
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: 가격 수집
+        run: python scripts/fetch_prices.py
+
+      - name: 결과 저장
+        if: always()
+        run: |
+          git config user.name "price-bot"
+          git config user.email "price-bot@users.noreply.github.com"
+          git add data/prices.json
+          if git diff --cached --quiet; then
+            echo "변경 없음"
+          else
+            git commit -m "가격 기록 $(TZ=Asia/Seoul date +%F)"
+            git push
+          fi

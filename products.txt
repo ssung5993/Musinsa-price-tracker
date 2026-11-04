@@ -1,0 +1,7 @@
+# 추적할 무신사 상품 링크 (한 줄에 하나)
+# 앱에서 '공유 > 링크 복사'한 링크를 그대로 붙여 넣으면 돼요.
+# 줄 맨 앞에 # 을 붙이면 그 줄은 무시돼요 (추적 일시 중지).
+
+https://musinsa.onelink.me/PvkC/3tlazgc3
+https://www.musinsa.com/products/5045929
+https://musinsa.onelink.me/PvkC/3hg76x5l

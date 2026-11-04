@@ -1,0 +1,297 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>무신사 가격 추적</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<style>
+  :root {
+    color-scheme: light;
+    --bg: #f4f4f2;
+    --surface-1: #fcfcfb;
+    --border: #e4e3df;
+    --grid: #ecebe7;
+    --text-primary: #0b0b0b;
+    --text-secondary: #52514e;
+    --text-muted: #8a8984;
+    --series-1: #2a78d6;
+    --series-1-soft: rgba(42, 120, 214, 0.10);
+    --down: #1a7f37;
+    --up: #c62828;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      color-scheme: dark;
+      --bg: #111110;
+      --surface-1: #1a1a19;
+      --border: #2c2c2a;
+      --grid: #262624;
+      --text-primary: #f0efec;
+      --text-secondary: #c3c2b7;
+      --text-muted: #8f8e88;
+      --series-1: #3987e5;
+      --series-1-soft: rgba(57, 135, 229, 0.16);
+      --down: #4cc06b;
+      --up: #ef6b6b;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text-primary);
+    font-family: "Pretendard", -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  main { max-width: 760px; margin: 0 auto; padding: 24px 16px 64px; }
+  header h1 { font-size: 22px; font-weight: 800; margin: 0 0 4px; letter-spacing: -0.02em; }
+  header p { margin: 0; color: var(--text-muted); font-size: 13px; }
+
+  .controls { display: flex; gap: 6px; margin: 20px 0 16px; flex-wrap: wrap; }
+  .controls button {
+    border: 1px solid var(--border); background: var(--surface-1); color: var(--text-secondary);
+    font: inherit; font-size: 13px; font-weight: 600; padding: 7px 14px; border-radius: 999px; cursor: pointer;
+  }
+  .controls button[aria-pressed="true"] { background: var(--text-primary); color: var(--surface-1); border-color: var(--text-primary); }
+
+  .card {
+    background: var(--surface-1); border: 1px solid var(--border); border-radius: 16px;
+    padding: 16px; margin-bottom: 14px;
+  }
+  .head { display: flex; gap: 12px; align-items: flex-start; }
+  .thumb { width: 64px; height: 64px; border-radius: 10px; object-fit: cover; background: var(--grid); flex: none; }
+  .meta { min-width: 0; flex: 1; }
+  .brand { font-size: 12px; color: var(--text-muted); font-weight: 600; }
+  .title {
+    display: block; color: var(--text-primary); text-decoration: none; font-size: 15px; font-weight: 600;
+    line-height: 1.35; margin-top: 2px;
+    overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+  }
+  .title:hover { text-decoration: underline; }
+  .now { margin-top: 6px; display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+  .now .price { font-size: 22px; font-weight: 800; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+  .now .rate { font-size: 13px; font-weight: 700; color: var(--up); }
+  .now .orig { font-size: 13px; color: var(--text-muted); text-decoration: line-through; }
+  .delta { font-size: 12px; font-weight: 700; }
+  .delta.down { color: var(--down); }
+  .delta.up { color: var(--up); }
+  .delta.same { color: var(--text-muted); }
+  .badge { font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 6px; background: var(--grid); color: var(--text-secondary); }
+
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 14px 0 8px; }
+  .stat { background: var(--bg); border-radius: 10px; padding: 8px 10px; }
+  .stat .k { font-size: 11px; color: var(--text-muted); font-weight: 600; }
+  .stat .v { font-size: 14px; font-weight: 700; font-variant-numeric: tabular-nums; margin-top: 2px; }
+  .stat .d { font-size: 11px; color: var(--text-muted); }
+
+  .chart-wrap { position: relative; height: 200px; }
+  .empty { height: 120px; display: grid; place-items: center; color: var(--text-muted); font-size: 13px; text-align: center; }
+
+  details { margin-top: 8px; }
+  summary { font-size: 12px; color: var(--text-muted); cursor: pointer; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 8px; font-variant-numeric: tabular-nums; }
+  th, td { text-align: right; padding: 6px 4px; border-bottom: 1px solid var(--grid); }
+  th:first-child, td:first-child { text-align: left; }
+  th { color: var(--text-muted); font-weight: 600; font-size: 12px; }
+
+  .section-title { font-size: 13px; color: var(--text-muted); font-weight: 700; margin: 28px 0 10px; }
+  .inactive .card { opacity: .65; }
+  .msg { padding: 40px 0; text-align: center; color: var(--text-muted); }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>무신사 가격 추적</h1>
+    <p id="updated">불러오는 중…</p>
+  </header>
+
+  <div class="controls" role="group" aria-label="기간">
+    <button data-range="7" aria-pressed="false">7일</button>
+    <button data-range="30" aria-pressed="true">30일</button>
+    <button data-range="90" aria-pressed="false">90일</button>
+    <button data-range="0" aria-pressed="false">전체</button>
+  </div>
+
+  <section id="list"></section>
+  <section id="inactive" class="inactive"></section>
+</main>
+
+<script>
+const won = n => n == null ? "-" : n.toLocaleString("ko-KR") + "원";
+const css = name => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+const fmtDate = d => { const [, m, day] = d.split("-"); return `${+m}/${+day}`; };
+const charts = [];
+let DATA = null;
+let range = 30;
+
+function filterRange(history) {
+  if (!range) return history;
+  const last = new Date(history[history.length - 1].date);
+  const from = new Date(last); from.setDate(from.getDate() - (range - 1));
+  return history.filter(h => new Date(h.date) >= from);
+}
+
+function card(p) {
+  const h = p.history;
+  const el = document.createElement("article");
+  el.className = "card";
+  if (!h || !h.length) {
+    el.innerHTML = `<div class="meta"><div class="brand">상품번호 ${p.id}</div>
+      <div class="empty">아직 기록이 없어요. 다음 자동 실행 때부터 쌓여요.</div></div>`;
+    return el;
+  }
+  const cur = h[h.length - 1];
+  const prev = h.length > 1 ? h[h.length - 2] : null;
+  const prices = h.map(x => x.price);
+  const min = Math.min(...prices), max = Math.max(...prices);
+  const minDay = [...h].reverse().find(x => x.price === min).date;
+  const maxDay = [...h].reverse().find(x => x.price === max).date;
+
+  let delta = "";
+  if (prev) {
+    const diff = cur.price - prev.price;
+    delta = diff < 0 ? `<span class="delta down">▼ ${won(-diff)} (전날 대비)</span>`
+          : diff > 0 ? `<span class="delta up">▲ ${won(diff)} (전날 대비)</span>`
+          : `<span class="delta same">전날과 같음</span>`;
+  }
+  const isLowest = h.length > 1 && cur.price === min;
+
+  el.innerHTML = `
+    <div class="head">
+      ${p.image ? `<img class="thumb" src="${p.image}" alt="" loading="lazy" referrerpolicy="no-referrer">` : ""}
+      <div class="meta">
+        <div class="brand">${p.brand || ""} ${cur.available === false ? '<span class="badge">품절</span>' : ""} ${isLowest ? '<span class="badge">역대 최저가</span>' : ""}</div>
+        <a class="title" href="${p.url}" target="_blank" rel="noopener">${p.title || p.id}</a>
+        <div class="now">
+          ${cur.sale_rate ? `<span class="rate">${cur.sale_rate}%</span>` : ""}
+          <span class="price">${won(cur.price)}</span>
+          ${cur.normal_price && cur.normal_price !== cur.price ? `<span class="orig">${won(cur.normal_price)}</span>` : ""}
+        </div>
+        ${delta}
+      </div>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="k">현재가</div><div class="v">${won(cur.price)}</div><div class="d">${fmtDate(cur.date)}</div></div>
+      <div class="stat"><div class="k">최저가</div><div class="v">${won(min)}</div><div class="d">${fmtDate(minDay)}</div></div>
+      <div class="stat"><div class="k">최고가</div><div class="v">${won(max)}</div><div class="d">${fmtDate(maxDay)}</div></div>
+    </div>
+    <div class="chart-wrap"><canvas aria-label="${p.title} 날짜별 가격 선그래프" role="img"></canvas></div>
+    <details><summary>날짜별 기록 표로 보기</summary>
+      <table><thead><tr><th>날짜</th><th>판매가</th><th>할인율</th></tr></thead>
+      <tbody>${[...h].reverse().map(x => `<tr><td>${x.date}</td><td>${won(x.price)}</td><td>${x.sale_rate ?? 0}%</td></tr>`).join("")}</tbody></table>
+    </details>`;
+  el._product = p;
+  el._min = min;
+  return el;
+}
+
+function drawChart(el) {
+  const canvas = el.querySelector("canvas");
+  if (!canvas) return;
+  const pts = filterRange(el._product.history);
+  const color = css("--series-1");
+  const minInView = Math.min(...pts.map(x => x.price));
+  const minIdx = pts.map(x => x.price).lastIndexOf(minInView); // 가장 최근 최저가 지점 하나만 강조
+  const lo = Math.min(...pts.map(x => x.price)), hi = Math.max(...pts.map(x => x.price));
+  const pad = Math.max((hi - lo) * 0.15, hi * 0.03);
+
+  charts.push(new Chart(canvas, {
+    type: "line",
+    data: {
+      labels: pts.map(x => fmtDate(x.date)),
+      datasets: [{
+        data: pts.map(x => x.price),
+        borderColor: color,
+        backgroundColor: css("--series-1-soft"),
+        fill: true,
+        borderWidth: 2,
+        tension: 0,
+        // 최저가 지점은 크게 채운 점, 나머지는 작은 점
+        pointRadius: pts.map((x, i) => i === minIdx ? 6 : (pts.length <= 31 ? 2.5 : 0)),
+        pointHoverRadius: 7,
+        pointBackgroundColor: pts.map((x, i) => i === minIdx ? color : css("--surface-1")),
+        pointBorderColor: color,
+        pointBorderWidth: 2,
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false, animation: false,
+      interaction: { mode: "index", intersect: false },
+      layout: { padding: { top: 6, right: 4 } },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: css("--text-primary"), titleColor: css("--surface-1"), bodyColor: css("--surface-1"),
+          displayColors: false, padding: 10, cornerRadius: 8,
+          titleFont: { family: "Pretendard", weight: "600" }, bodyFont: { family: "Pretendard", size: 14, weight: "700" },
+          callbacks: {
+            title: items => pts[items[0].dataIndex].date,
+            label: item => {
+              const x = pts[item.dataIndex];
+              return `${won(x.price)}${x.sale_rate ? `  (${x.sale_rate}% 할인)` : ""}${x.price === minInView ? "  · 최저" : ""}`;
+            }
+          }
+        }
+      },
+      scales: {
+        x: { grid: { display: false }, border: { color: css("--border") },
+             ticks: { color: css("--text-muted"), font: { family: "Pretendard", size: 11 }, maxTicksLimit: 6, maxRotation: 0 } },
+        y: { suggestedMin: lo - pad, suggestedMax: hi + pad,
+             grid: { color: css("--grid") }, border: { display: false },
+             ticks: { color: css("--text-muted"), font: { family: "Pretendard", size: 11 }, maxTicksLimit: 4,
+                      callback: v => (v >= 10000 ? (v / 10000).toLocaleString("ko-KR", { maximumFractionDigits: 1 }) + "만" : v.toLocaleString("ko-KR")) } }
+      }
+    }
+  }));
+}
+
+function render() {
+  charts.splice(0).forEach(c => c.destroy());
+  const list = document.getElementById("list");
+  const inactive = document.getElementById("inactive");
+  list.innerHTML = ""; inactive.innerHTML = "";
+
+  const all = DATA.products || {};
+  const order = DATA.order || Object.keys(all);
+  const activeIds = order.length ? order : Object.keys(all);
+  const cards = [];
+
+  activeIds.forEach(id => {
+    const p = all[id] || { id, history: [] };
+    const el = card(p); list.appendChild(el); cards.push(el);
+  });
+
+  const stopped = Object.values(all).filter(p => p.active === false && !activeIds.includes(p.id));
+  if (stopped.length) {
+    inactive.innerHTML = `<div class="section-title">추적 중지된 상품 (기록은 보관 중)</div>`;
+    stopped.forEach(p => { const el = card(p); inactive.appendChild(el); cards.push(el); });
+  }
+  if (!cards.length) list.innerHTML = `<div class="msg">products.txt 에 상품 링크를 추가해 주세요.</div>`;
+  cards.forEach(drawChart);
+}
+
+document.querySelectorAll(".controls button").forEach(b => b.addEventListener("click", () => {
+  range = +b.dataset.range;
+  document.querySelectorAll(".controls button").forEach(x => x.setAttribute("aria-pressed", x === b));
+  render();
+}));
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => DATA && render());
+
+fetch("data/prices.json?t=" + Date.now())
+  .then(r => r.json())
+  .then(d => {
+    DATA = d;
+    const t = d.updated_at ? new Date(d.updated_at) : null;
+    document.getElementById("updated").textContent = t
+      ? `마지막 업데이트 ${t.toLocaleString("ko-KR", { month: "long", day: "numeric", hour: "2-digit", minute: "2-digit" })} · 매일 오전 9시쯤 자동 기록`
+      : "아직 기록이 없어요";
+    render();
+  })
+  .catch(() => { document.getElementById("list").innerHTML = `<div class="msg">가격 데이터를 불러오지 못했어요.</div>`; });
+</script>
+</body>
+</html>
