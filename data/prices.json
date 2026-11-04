@@ -1,10 +1,20 @@
 {
-  "updated_at": "2026-11-04T21:20+09:00",
-  "order": ["7047838", "5045929", "4652855"],
+  "updated_at": "2026-11-04T21:30+09:00",
+  "order": [
+    "7047838",
+    "5045929",
+    "4652855"
+  ],
   "products": {
     "7047838": {
       "history": [
-        {"date": "2026-11-04", "price": 75050, "normal_price": 79000, "sale_rate": 5, "available": true}
+        {
+          "date": "2026-11-04",
+          "price": 75050,
+          "normal_price": 79000,
+          "sale_rate": 5,
+          "available": true
+        }
       ],
       "id": "7047838",
       "url": "https://www.musinsa.com/products/7047838",
@@ -15,13 +25,36 @@
     },
     "4652855": {
       "history": [
-        {"date": "2026-11-04", "price": 34690, "normal_price": 59900, "sale_rate": 42, "available": true}
+        {
+          "date": "2026-11-04",
+          "price": 34690,
+          "normal_price": 59900,
+          "sale_rate": 42,
+          "available": true
+        }
       ],
       "id": "4652855",
       "url": "https://www.musinsa.com/products/4652855",
       "title": "무신사 스탠다드(MUSINSA STANDARD) [시티 레저] 라이트웨이트 스티치 윈드브레이커 재킷 [블랙]",
       "brand": "무신사 스탠다드",
       "image": "https://image.msscdn.net/images/goods_img/20241206/4652855/4652855_17417682578234_500.jpg",
+      "active": true
+    },
+    "5045929": {
+      "history": [
+        {
+          "date": "2026-11-04",
+          "price": 121600,
+          "normal_price": 128000,
+          "sale_rate": 5,
+          "available": true
+        }
+      ],
+      "id": "5045929",
+      "url": "https://www.musinsa.com/products/5045929",
+      "title": "유니온블루(UNION BLUE) ARCHON WIDE DENIM PANTS [WASHED BLACK]",
+      "brand": "유니온블루",
+      "image": "https://image.msscdn.net/images/goods_img/20250421/5045929/5045929_17477052630708_500.jpg",
       "active": true
     }
   }
