@@ -4,6 +4,10 @@ on:
   schedule:
     # 매일 한국 시간 오전 9시 17분 (GitHub 예약은 UTC 기준이라 00:17)
     - cron: "17 0 * * *"
+    # 예비 실행: GitHub가 예약 실행을 가끔 건너뛰어서 두 번 더 시도해요.
+    # 그날 기록이 이미 있으면 아무것도 안 하고 끝나요. (한국 시간 12시 41분, 18시 53분)
+    - cron: "41 3 * * *"
+    - cron: "53 9 * * *"
   workflow_dispatch: # Actions 탭에서 'Run workflow' 버튼으로 바로 실행 가능
   push:
     paths:
@@ -22,15 +26,27 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: 오늘 기록 확인
+        id: check
+        if: github.event_name == 'schedule'
+        run: |
+          today=$(TZ=Asia/Seoul date +%F)
+          if grep -q "\"date\": \"$today\"" data/prices.json; then
+            echo "오늘($today) 기록이 이미 있어서 건너뛰어요"
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          fi
+
       - uses: actions/setup-python@v5
+        if: steps.check.outputs.skip != 'true'
         with:
           python-version: "3.12"
 
       - name: 가격 수집
+        if: steps.check.outputs.skip != 'true'
         run: python scripts/fetch_prices.py
 
       - name: 결과 저장
-        if: always()
+        if: always() && steps.check.outputs.skip != 'true'
         run: |
           git config user.name "price-bot"
           git config user.email "price-bot@users.noreply.github.com"
