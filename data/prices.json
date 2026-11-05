@@ -1,9 +1,10 @@
 {
-  "updated_at": "2026-11-05T11:48+09:00",
+  "updated_at": "2026-11-05T11:58+09:00",
   "order": [
     "7047838",
     "5045929",
-    "4652855"
+    "4652855",
+    "7049343"
   ],
   "products": {
     "7047838": {
@@ -76,6 +77,23 @@
       "title": "유니온블루(UNION BLUE) ARCHON WIDE DENIM PANTS [WASHED BLACK]",
       "brand": "유니온블루",
       "image": "https://image.msscdn.net/images/goods_img/20250421/5045929/5045929_17477052630708_500.jpg",
+      "active": true
+    },
+    "7049343": {
+      "history": [
+        {
+          "date": "2026-11-05",
+          "price": 78400,
+          "normal_price": 98000,
+          "sale_rate": 20,
+          "available": true
+        }
+      ],
+      "id": "7049343",
+      "url": "https://www.musinsa.com/products/7049343",
+      "title": "브랜디드(BRANDED) EASY WIDE CHINO PANTS [GRAPHITE]",
+      "brand": "브랜디드",
+      "image": "https://image.msscdn.net/images/goods_img/20260811/7049343/7049343_17875577031655_500.jpg",
       "active": true
     }
   }
