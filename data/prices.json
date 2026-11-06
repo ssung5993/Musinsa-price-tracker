@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-06T02:41+09:00",
+  "updated_at": "2026-11-07T01:58+09:00",
   "order": [
     "7047838",
     "5045929",
@@ -25,6 +25,13 @@
         },
         {
           "date": "2026-11-06",
+          "price": 75050,
+          "normal_price": 79000,
+          "sale_rate": 5,
+          "available": true
+        },
+        {
+          "date": "2026-11-07",
           "price": 75050,
           "normal_price": 79000,
           "sale_rate": 5,
@@ -60,6 +67,13 @@
           "normal_price": 59900,
           "sale_rate": 42,
           "available": true
+        },
+        {
+          "date": "2026-11-07",
+          "price": 34690,
+          "normal_price": 59900,
+          "sale_rate": 42,
+          "available": true
         }
       ],
       "id": "4652855",
@@ -91,6 +105,13 @@
           "normal_price": 128000,
           "sale_rate": 5,
           "available": true
+        },
+        {
+          "date": "2026-11-07",
+          "price": 121600,
+          "normal_price": 128000,
+          "sale_rate": 5,
+          "available": true
         }
       ],
       "id": "5045929",
@@ -111,6 +132,13 @@
         },
         {
           "date": "2026-11-06",
+          "price": 78400,
+          "normal_price": 98000,
+          "sale_rate": 20,
+          "available": true
+        },
+        {
+          "date": "2026-11-07",
           "price": 78400,
           "normal_price": 98000,
           "sale_rate": 20,
